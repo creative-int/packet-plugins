@@ -1,0 +1,25 @@
+{
+	"name": "packet",
+	"version": "0.1.0",
+	"description": "Read shared Packet artifacts, sources, evidence, and receipt graphs from agents.",
+	"author": {
+		"name": "creative-int",
+		"email": "hello@creative-int.com"
+	},
+	"homepage": "https://packet.creative-int.com",
+	"repository": "https://github.com/creative-int/packet-plugins.git",
+	"license": "MIT",
+	"keywords": [
+		"packet",
+		"mcp",
+		"agent-skills",
+		"context",
+		"artifacts",
+		"receipts",
+		"evidence",
+		"proof"
+	],
+	"displayName": "Packet",
+	"skills": "./skills",
+	"mcpServers": "./.mcp.json"
+}

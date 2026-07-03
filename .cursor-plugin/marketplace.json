@@ -1,0 +1,19 @@
+{
+	"name": "packet",
+	"owner": {
+		"name": "creative-int",
+		"email": "hello@creative-int.com"
+	},
+	"metadata": {
+		"description": "Read shared Packet artifacts, sources, evidence, and receipt graphs from agents.",
+		"repoProfile": "agent-plugin-companion",
+		"companionOf": "packet"
+	},
+	"plugins": [
+		{
+			"name": "packet",
+			"source": ".",
+			"description": "Read shared Packet artifacts, sources, evidence, and receipt graphs from agents."
+		}
+	]
+}

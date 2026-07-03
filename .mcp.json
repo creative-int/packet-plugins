@@ -1,0 +1,7 @@
+{
+	"mcpServers": {
+		"packet": {
+			"url": "https://packet.creative-int.com/api/mcp"
+		}
+	}
+}

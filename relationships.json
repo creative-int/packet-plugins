@@ -1,0 +1,14 @@
+{
+	"$schema": "../../packages/relationships.schema.json",
+	"repo": "packet-plugins",
+	"repoProfile": "agent-plugin-companion",
+	"companionOf": "packet",
+	"companionRepos": [
+		{
+			"name": "packet-plugins",
+			"repoPath": "apps/packet-plugins",
+			"repoProfile": "agent-plugin-companion",
+			"companionOf": "packet"
+		}
+	]
+}

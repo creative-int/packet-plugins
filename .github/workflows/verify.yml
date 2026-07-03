@@ -1,0 +1,24 @@
+name: verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: [self-hosted, macOS, ARM64, cic-macbook-pro]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Generated files are up to date
+        run: pnpm run check:generated
+      - name: Typecheck
+        run: pnpm run typecheck
+      - name: Manifest smoke
+        run: pnpm run smoke

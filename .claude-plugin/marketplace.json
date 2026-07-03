@@ -1,0 +1,15 @@
+{
+	"name": "packet",
+	"owner": {
+		"name": "creative-int",
+		"email": "hello@creative-int.com"
+	},
+	"plugins": [
+		{
+			"name": "packet",
+			"displayName": "Packet",
+			"source": "./",
+			"description": "Read shared Packet artifacts, sources, evidence, and receipt graphs from agents."
+		}
+	]
+}

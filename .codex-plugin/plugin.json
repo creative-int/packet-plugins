@@ -1,0 +1,41 @@
+{
+	"name": "packet",
+	"version": "0.1.0",
+	"description": "Read shared Packet artifacts, sources, evidence, and receipt graphs from agents.",
+	"author": {
+		"name": "creative-int",
+		"email": "hello@creative-int.com"
+	},
+	"homepage": "https://packet.creative-int.com",
+	"repository": "https://github.com/creative-int/packet-plugins.git",
+	"license": "MIT",
+	"keywords": [
+		"packet",
+		"mcp",
+		"agent-skills",
+		"context",
+		"artifacts",
+		"receipts",
+		"evidence",
+		"proof"
+	],
+	"skills": "./skills",
+	"mcpServers": "./.mcp.json",
+	"interface": {
+		"displayName": "Packet",
+		"shortDescription": "Read shared Packet artifacts, sources, evidence, and receipt graphs from agents.",
+		"longDescription": "Packet is the creative-int creation-artifact contract: sources, workflow steps, credits, provider receipts, exports, status receipts, and proof records in one durable object. This companion gives agents a small read-only context workflow over Packet's MCP read surface: search shared packet artifacts, then fetch the exact receipt graph the app renders.",
+		"developerName": "creative-int",
+		"category": "Productivity",
+		"capabilities": [
+			"Read",
+			"MCP",
+			"Skills"
+		],
+		"defaultPrompt": [
+			"Find the relevant Packet and pull its receipt graph.",
+			"Read the production golden-thread Packet proof.",
+			"Search Packet sources for this handoff."
+		]
+	}
+}
