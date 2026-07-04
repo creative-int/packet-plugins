@@ -29,7 +29,9 @@ truth without minting new receipts or spending credits.
 ## Do Not Use When
 
 - The answer is fully available in local files and no Packet artifact is needed.
-- The user wants to create or mutate a Packet; this skill is read-only.
+- The user wants to create or mutate a Packet through the MCP read tools; the
+  read tools stay read-only. Use the Packet-side agent publish contract below
+  when the task is explicitly to publish a markdown/debrief artifact.
 - The requested artifact is private or unavailable. Say it is not shared instead
   of trying to bypass visibility.
 
@@ -42,6 +44,43 @@ truth without minting new receipts or spending credits.
   `{ "slug": "production-golden-thread" }`.
 
 Both tools are read-only. They spend zero credits and must not create receipts.
+
+## Agent Publish Contract
+
+When Luke explicitly asks an agent to publish a markdown/debrief Packet, agents
+drive the Packet-side publish path instead of hand-uploading or inventing a
+separate write tool.
+
+Preferred Packet repo command:
+
+```sh
+pnpm publish:debrief -- <markdown-file> <slug> \
+  --site-url <packet-dev-or-approved-site-url> \
+  --convex-url <matching-convex-url> \
+  --metadata '{"source":"agent-closeout"}'
+```
+
+CLI sugar in the Packet checkout:
+
+```sh
+packet publish <slug> --from-file <markdown-file> \
+  --site-url <packet-dev-or-approved-site-url> \
+  --convex-url <matching-convex-url>
+```
+
+Required contract:
+
+- `PACKET_MCP_INGEST_TOKEN` supplies the bearer token for `POST /api/mcp/ingest`.
+- The publish request must set `publish: true` and include a stable
+  idempotency key or let `scripts/agent-publish.mjs` derive one from the slug,
+  markdown hash, objective, and metadata.
+- Always pass explicit `--site-url` and `--convex-url`; dev-agent config and
+  shell env can point at different deployments.
+- A real run is not done until the script verifies `packet_get` against the
+  same Convex URL and finds the source/capture, publish, and rendered export
+  receipts.
+- No production writes from this companion contract unless Luke explicitly
+  authorizes the target; Fable-owned production runs remain separate.
 
 ## Workflow
 
