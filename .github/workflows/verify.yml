@@ -14,7 +14,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
+      - name: Use persistent pnpm store
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "store-dir=$HOME/Library/pnpm/store" >> "$GITHUB_WORKSPACE/.npmrc"
+          echo "npm_config_store_dir=$HOME/Library/pnpm/store" >> "$GITHUB_ENV"
+
       - run: pnpm install --frozen-lockfile
       - name: Generated files are up to date
         run: pnpm run check:generated
