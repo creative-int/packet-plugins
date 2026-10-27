@@ -51,6 +51,7 @@ Point your MCP-aware client at Packet's remote MCP metadata URL.
 {
 	"mcpServers": {
 		"packet": {
+			"type": "http",
 			"url": "https://packet.creative-int.com/api/mcp"
 		}
 	}

@@ -4,6 +4,9 @@
 		"name": "creative-int",
 		"email": "hello@creative-int.com"
 	},
+	"metadata": {
+		"description": "Read shared Packet artifacts, sources, evidence, and receipt graphs from agents."
+	},
 	"plugins": [
 		{
 			"name": "packet",

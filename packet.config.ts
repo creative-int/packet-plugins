@@ -22,6 +22,9 @@ export interface PacketPluginConfig {
 	mcp: {
 		id: string;
 		url: string;
+		/** Client-config transport. Claude Code drops a remote entry without it. */
+		type: "http";
+		/** MCP Registry (server.json) spelling of the same transport. */
 		transport: "streamable-http";
 		endpoints: {
 			search: string;
@@ -54,7 +57,7 @@ export interface PacketPluginConfig {
 export const packet: PacketPluginConfig = {
 	name: "packet",
 	displayName: "Packet",
-	version: "0.1.0",
+	version: "0.1.1",
 	tagline: "Agent-readable creation artifacts with receipt graphs.",
 	shortDescription:
 		"Read shared Packet artifacts, sources, evidence, and receipt graphs from agents.",
@@ -78,6 +81,7 @@ export const packet: PacketPluginConfig = {
 	mcp: {
 		id: "packet",
 		url: "https://packet.creative-int.com/api/mcp",
+		type: "http",
 		transport: "streamable-http",
 		endpoints: {
 			search: "https://packet.creative-int.com/api/mcp/search",
