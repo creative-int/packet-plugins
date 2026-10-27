@@ -23,6 +23,12 @@ function slug() {
 	return packet.repository.replace("https://github.com/", "");
 }
 
+// One remote entry for .mcp.json and the README example, so they cannot drift.
+// Claude Code reads an entry without `type` as stdio and drops it.
+const remoteMcpServers = {
+	[packet.mcp.id]: { type: packet.mcp.type, url: packet.mcp.url },
+};
+
 export const installClients = [
 	{
 		id: "skills",
@@ -56,15 +62,7 @@ export const installClients = [
 		id: "mcp-remote",
 		label: "Any remote MCP client",
 		blurb: "Point your MCP-aware client at Packet's remote MCP metadata URL.",
-		steps: [
-			json({
-				mcpServers: {
-					[packet.mcp.id]: {
-						url: packet.mcp.url,
-					},
-				},
-			}).trim(),
-		],
+		steps: [json({ mcpServers: remoteMcpServers }).trim()],
 	},
 	{
 		id: "http-read-tools",
@@ -88,9 +86,7 @@ export const installClients = [
 ];
 
 const files: Record<string, string> = {
-	".mcp.json": json({
-		mcpServers: { [packet.mcp.id]: { url: packet.mcp.url } },
-	}),
+	".mcp.json": json({ mcpServers: remoteMcpServers }),
 
 	".claude-plugin/plugin.json": json({
 		name: packet.name,
@@ -108,6 +104,7 @@ const files: Record<string, string> = {
 	".claude-plugin/marketplace.json": json({
 		name: packet.name,
 		owner: author,
+		metadata: { description: packet.shortDescription },
 		plugins: [
 			{
 				name: packet.name,

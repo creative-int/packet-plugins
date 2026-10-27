@@ -39,23 +39,97 @@ for (const file of generated) {
 	readJson(file);
 }
 
+/**
+ * A Claude-compatible remote entry. Claude Code parses an entry without
+ * `type` as stdio, fails it for lacking `command`, and silently drops it.
+ */
+function checkRemoteEntry(entry: unknown, where: string) {
+	const server = getRecord(entry, `${where} is not an object`);
+	assert(
+		server.type === "http",
+		`${where} must declare type "http"; without it Claude Code drops the server`,
+	);
+	assert(server.url === packet.mcp.url, `${where} has a stale Packet MCP URL`);
+	assert(!("command" in server), `${where} must not carry a stdio command`);
+}
+
+function checkMcpServers(value: unknown, where: string) {
+	const servers = getRecord(value, `${where} missing mcpServers`);
+	assert(
+		Object.keys(servers).join(",") === packet.mcp.id,
+		`${where} must declare only the ${packet.mcp.id} server`,
+	);
+	checkRemoteEntry(servers[packet.mcp.id], `${where} ${packet.mcp.id} server`);
+	return servers[packet.mcp.id];
+}
+
 const mcp = readJson(".mcp.json");
-const mcpServers = getRecord(mcp.mcpServers, ".mcp.json missing mcpServers");
-const packetServer = getRecord(
-	mcpServers[packet.mcp.id],
-	".mcp.json missing packet server",
-);
-assert(packetServer.url === packet.mcp.url, ".mcp.json has stale Packet MCP URL");
+const packetServer = checkMcpServers(mcp.mcpServers, ".mcp.json");
+
+// Every distributed example that a Claude-compatible client could paste.
+const readme = readFileSync(new URL("README.md", root), "utf8");
+const installBlock = readme.match(
+	/<!-- AUTO-GENERATED:INSTALL START -->([\s\S]*?)<!-- AUTO-GENERATED:INSTALL END -->/,
+)?.[1];
+assert(installBlock, "README is missing the AUTO-GENERATED install block");
+const examples = [...installBlock.matchAll(/```json\n([\s\S]*?)\n```/g)]
+	.map((match) => JSON.parse(match[1] ?? "") as Record<string, unknown>)
+	.filter((example) => "mcpServers" in example);
+assert(examples.length > 0, "README has no remote MCP client example");
+for (const example of examples) {
+	checkMcpServers(example.mcpServers, "README remote MCP example");
+}
+
+// The check must reject a missing or wrong transport, every run.
+const transportMutations: Array<[string, (entry: Record<string, unknown>) => void]> = [
+	["no type", (entry) => {
+		delete entry.type;
+	}],
+	["type stdio", (entry) => {
+		entry.type = "stdio";
+	}],
+	["the registry spelling", (entry) => {
+		entry.type = "streamable-http";
+	}],
+];
+for (const [label, mutate] of transportMutations) {
+	const mutated = structuredClone(getRecord(packetServer, ".mcp.json server"));
+	mutate(mutated);
+	let rejected = false;
+	try {
+		checkRemoteEntry(mutated, `self-test (${label})`);
+	} catch {
+		rejected = true;
+	}
+	assert(rejected, `transport check accepted a remote entry with ${label}`);
+}
 
 const server = readJson("server.json");
 assert(server.name === packet.registryName, "server.json registry name drift");
 assert(server.description === packet.shortDescription, "server.json description drift");
+assert(server.version === packet.version, "server.json version drift");
 const remotes = server.remotes;
 assert(Array.isArray(remotes) && remotes.length === 1, "server.json remotes invalid");
+const remote = getRecord(remotes[0], "server.json remote invalid");
+assert(remote.url === packet.mcp.url, "server.json remote URL drift");
 assert(
-	getRecord(remotes[0], "server.json remote invalid").url === packet.mcp.url,
-	"server.json remote URL drift",
+	remote.type === packet.mcp.transport && packet.mcp.transport === "streamable-http",
+	"server.json remote must keep the registry transport spelling streamable-http",
 );
+
+const marketplace = readJson(".claude-plugin/marketplace.json");
+const marketplaceMetadata = getRecord(
+	marketplace.metadata,
+	".claude-plugin/marketplace.json metadata missing",
+);
+assert(
+	typeof marketplaceMetadata.description === "string" &&
+		marketplaceMetadata.description.length > 0,
+	".claude-plugin/marketplace.json needs a description for strict validation",
+);
+
+const packageJson = readJson("package.json");
+assert(packageJson.version === packet.version, "package.json version drift");
 const serverMetadata = getRecord(server.metadata, "server.json metadata missing");
 assert(
 	serverMetadata.repoProfile === "agent-plugin-companion",
@@ -70,6 +144,7 @@ for (const manifestPath of [
 ]) {
 	const manifest = readJson(manifestPath);
 	assert(manifest.name === packet.name, `${manifestPath} name drift`);
+	assert(manifest.version === packet.version, `${manifestPath} version drift`);
 	assert(manifest.skills === "./skills", `${manifestPath} skills path drift`);
 	assert(
 		manifest.mcpServers === "./.mcp.json",

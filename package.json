@@ -1,6 +1,6 @@
 {
 	"name": "@creative-int/packet-plugins",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"private": true,
 	"description": "Packet agent plugin companion: generated Cursor, Codex, Claude Code, MCP, and packet-context skill adapters.",
 	"keywords": [
